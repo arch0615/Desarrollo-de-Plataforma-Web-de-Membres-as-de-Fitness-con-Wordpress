@@ -8,6 +8,7 @@ import { formatDuration } from "@/lib/format";
 import { buildPlaybackInfo, isBunnyConfigured } from "@/lib/bunny";
 import { ClassPlayer } from "./class-player";
 import { FavoriteButton } from "./favorite-button";
+import { AddToPlaylistButton } from "./add-to-playlist-button";
 
 export const dynamic = "force-dynamic";
 
@@ -128,10 +129,13 @@ export default async function ClassDetailPage({
                 ))}
               </div>
             </div>
-            <FavoriteButton
-              classId={cls.id}
-              initiallyFavorited={!!favorite}
-            />
+            <div className="flex gap-2 shrink-0">
+              <FavoriteButton
+                classId={cls.id}
+                initiallyFavorited={!!favorite}
+              />
+              <AddToPlaylistButton classId={cls.id} />
+            </div>
           </div>
 
           {cls.description && (
