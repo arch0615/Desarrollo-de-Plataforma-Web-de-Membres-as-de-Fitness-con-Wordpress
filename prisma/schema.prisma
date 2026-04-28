@@ -1,0 +1,278 @@
+// Milagros Fitness — schema v1
+// Generator + datasource follow the modern Prisma 7 convention (prisma-client, custom output).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Users & Auth
+// ────────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  member
+  admin
+}
+
+model User {
+  id              String    @id @default(uuid()) @db.Uuid
+  email           String    @unique
+  passwordHash    String
+  name            String
+  avatarUrl       String?
+  role            UserRole  @default(member)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  emailTokens   EmailToken[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  views         ClassView[]
+  favorites     Favorite[]
+  playlists     Playlist[]
+  auditLogs     AuditLog[]    @relation("AdminAudit")
+
+  @@index([email])
+}
+
+enum EmailTokenPurpose {
+  verify
+  reset
+}
+
+model EmailToken {
+  id        String            @id @default(uuid()) @db.Uuid
+  userId    String            @db.Uuid
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String            @unique
+  purpose   EmailTokenPurpose
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime          @default(now())
+
+  @@index([userId])
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Plans, Subscriptions, Payments
+// ────────────────────────────────────────────────────────────────────────
+
+enum PlanInterval {
+  month
+  quarter
+  year
+}
+
+model Plan {
+  id                  String       @id @default(uuid()) @db.Uuid
+  name                String
+  slug                String       @unique
+  interval            PlanInterval
+  priceCents          Int
+  currency            String       @default("ARS")
+  mpPreapprovalPlanId String?      @unique
+  features            Json         @default("[]")
+  isActive            Boolean      @default(true)
+  sortOrder           Int          @default(0)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  subscriptions Subscription[]
+}
+
+enum SubscriptionStatus {
+  pending
+  active
+  past_due
+  cancelled
+  expired
+}
+
+model Subscription {
+  id                 String             @id @default(uuid()) @db.Uuid
+  userId             String             @db.Uuid
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId             String             @db.Uuid
+  plan               Plan               @relation(fields: [planId], references: [id])
+  status             SubscriptionStatus @default(pending)
+  mpPreapprovalId    String?            @unique
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean            @default(false)
+  cancelledAt        DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  payments Payment[]
+
+  @@index([userId, status])
+  @@index([status, currentPeriodEnd])
+}
+
+enum PaymentStatus {
+  pending
+  approved
+  rejected
+  refunded
+}
+
+model Payment {
+  id             String        @id @default(uuid()) @db.Uuid
+  userId         String        @db.Uuid
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId String?       @db.Uuid
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  amountCents    Int
+  currency       String        @default("ARS")
+  status         PaymentStatus @default(pending)
+  mpPaymentId    String?       @unique
+  paidAt         DateTime?
+  rawEvent       Json?
+  createdAt      DateTime      @default(now())
+
+  @@index([userId, paidAt])
+  @@index([status])
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Content: Categories & Classes
+// ────────────────────────────────────────────────────────────────────────
+
+model Category {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  coverUrl  String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  classes Class[]
+}
+
+enum ClassLevel {
+  beginner
+  intermediate
+  advanced
+}
+
+enum ClassStatus {
+  draft
+  processing
+  published
+  archived
+}
+
+model Class {
+  id              String      @id @default(uuid()) @db.Uuid
+  slug            String      @unique
+  title           String
+  description     String      @db.Text
+  categoryId      String      @db.Uuid
+  category        Category    @relation(fields: [categoryId], references: [id])
+  level           ClassLevel  @default(beginner)
+  durationSeconds Int         @default(0)
+  equipment       String[]    @default([])
+  thumbnailUrl    String?
+  bunnyVideoId    String?     @unique
+  status          ClassStatus @default(draft)
+  publishedAt     DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  views         ClassView[]
+  favorites     Favorite[]
+  playlistItems PlaylistItem[]
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId, status])
+}
+
+model ClassView {
+  id                  String    @id @default(uuid()) @db.Uuid
+  userId              String    @db.Uuid
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classId             String    @db.Uuid
+  class               Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+  lastPositionSeconds Int       @default(0)
+  completedAt         DateTime?
+  lastViewedAt        DateTime  @default(now())
+
+  @@unique([userId, classId])
+  @@index([userId, lastViewedAt(sort: Desc)])
+}
+
+model Favorite {
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classId   String   @db.Uuid
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, classId])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model Playlist {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @db.Uuid
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  coverUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items PlaylistItem[]
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model PlaylistItem {
+  playlistId String   @db.Uuid
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  classId    String   @db.Uuid
+  class      Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  sortOrder  Int      @default(0)
+  addedAt    DateTime @default(now())
+
+  @@id([playlistId, classId])
+  @@index([playlistId, sortOrder])
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Webhooks (idempotency) & Audit
+// ────────────────────────────────────────────────────────────────────────
+
+model WebhookEvent {
+  id          String    @id @default(uuid()) @db.Uuid
+  provider    String
+  eventId     String
+  payload     Json
+  processedAt DateTime?
+  error       String?
+  createdAt   DateTime  @default(now())
+
+  @@unique([provider, eventId])
+  @@index([processedAt])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  adminId    String   @db.Uuid
+  admin      User     @relation("AdminAudit", fields: [adminId], references: [id])
+  action     String
+  targetType String
+  targetId   String
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([adminId, createdAt(sort: Desc)])
+  @@index([targetType, targetId])
+}
