@@ -12,9 +12,9 @@ export function SiteFooter() {
           <Link href="/privacidad" className="hover:text-foreground">
             Privacidad
           </Link>
-          <Link href="/contacto" className="hover:text-foreground">
+          <a href="mailto:hola@milagros.app" className="hover:text-foreground">
             Contacto
-          </Link>
+          </a>
         </nav>
       </div>
     </footer>
