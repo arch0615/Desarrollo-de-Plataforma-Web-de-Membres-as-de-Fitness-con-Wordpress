@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buttonVariants } from "@/components/ui/button";
 import { formatDuration } from "@/lib/format";
+import { requireActiveAccess } from "@/lib/access";
 import { PlaylistActions } from "./playlist-actions";
 import { PlaylistItemRow } from "./playlist-item-row";
 
@@ -21,8 +21,8 @@ export default async function PlaylistDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const session = await auth();
-  const userId = session!.user.id;
+  const { session } = await requireActiveAccess();
+  const userId = session.user.id;
 
   const playlist = await prisma.playlist.findFirst({
     where: { id, userId },

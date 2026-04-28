@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireActiveAccess } from "@/lib/access";
 import { Badge } from "@/components/ui/badge";
 import { ClassCard, type ClassCardData } from "@/components/classes/class-card";
 import { formatDuration } from "@/lib/format";
@@ -41,8 +41,8 @@ export default async function ClassDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const session = await auth();
-  const userId = session!.user.id;
+  const { session } = await requireActiveAccess();
+  const userId = session.user.id;
 
   const cls = await prisma.class.findUnique({
     where: { slug },

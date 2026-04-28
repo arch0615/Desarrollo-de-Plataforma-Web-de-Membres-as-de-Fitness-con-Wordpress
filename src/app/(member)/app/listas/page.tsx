@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { CreatePlaylistButton } from "./create-playlist-button";
+import { requireActiveAccess } from "@/lib/access";
 
 export const metadata = { title: "Mis listas" };
 
 export default async function PlaylistsPage() {
-  const session = await auth();
-  const userId = session!.user.id;
+  const { session } = await requireActiveAccess();
+  const userId = session.user.id;
 
   const playlists = await prisma.playlist.findMany({
     where: { userId },

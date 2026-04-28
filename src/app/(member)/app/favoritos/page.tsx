@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ClassCard, type ClassCardData } from "@/components/classes/class-card";
 import { buttonVariants } from "@/components/ui/button";
+import { requireActiveAccess } from "@/lib/access";
 
 export const metadata = { title: "Favoritos" };
 
 export default async function FavoritesPage() {
-  const session = await auth();
-  const userId = session!.user.id;
+  const { session } = await requireActiveAccess();
+  const userId = session.user.id;
 
   const favorites = await prisma.favorite.findMany({
     where: { userId },

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { formatPrice, intervalLabel } from "@/lib/format";
+import { CancelSubscriptionButton } from "./cancel-button";
 
 export const metadata = { title: "Suscripción" };
 
@@ -114,16 +115,7 @@ export default async function SubscriptionPage() {
 
           <div className="mt-6 flex flex-wrap gap-2">
             {sub.status === "active" && !sub.cancelAtPeriodEnd && (
-              <button
-                disabled
-                className={buttonVariants({
-                  variant: "outline",
-                  className: "opacity-60 cursor-not-allowed",
-                })}
-                title="Disponible cuando se conecte Mercado Pago"
-              >
-                Cancelar suscripción
-              </button>
+              <CancelSubscriptionButton periodEnd={sub.currentPeriodEnd} />
             )}
             <Link
               href="/membresia"
@@ -132,10 +124,6 @@ export default async function SubscriptionPage() {
               Cambiar plan
             </Link>
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Las acciones de cobro y cancelación se conectan con Mercado Pago en
-            el siguiente paso del proyecto.
-          </p>
         </section>
       )}
 

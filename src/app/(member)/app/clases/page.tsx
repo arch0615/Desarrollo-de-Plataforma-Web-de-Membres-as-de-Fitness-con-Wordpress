@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ClassCard, type ClassCardData } from "@/components/classes/class-card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { requireActiveAccess } from "@/lib/access";
 
 export const metadata = { title: "Clases" };
 
@@ -53,6 +54,7 @@ export default async function LibraryPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  await requireActiveAccess();
   const sp = await searchParams;
   const q = sp.q?.trim() ?? "";
   const catSlug = sp.cat ?? "";

@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { requireActiveAccess } from "@/lib/access";
 import { ClassRow } from "@/components/classes/class-row";
 import type { ClassCardData } from "@/components/classes/class-card";
 
 export const metadata = { title: "Inicio" };
 
 export default async function DashboardPage() {
-  const session = await auth();
-  const userId = session!.user.id;
+  const { session } = await requireActiveAccess();
+  const userId = session.user.id;
 
   // Continue-watching: rows the user has started but not completed.
   const inProgress = await prisma.classView.findMany({
