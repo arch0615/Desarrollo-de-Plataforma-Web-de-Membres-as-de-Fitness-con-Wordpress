@@ -50,7 +50,13 @@ const FAQ = [
   },
 ];
 
-export default async function MembershipPage() {
+export default async function MembershipPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reason?: string }>;
+}) {
+  const sp = await searchParams;
+  const reason = sp.reason;
   const plans = await prisma.plan.findMany({
     where: { isActive: true },
     orderBy: { sortOrder: "asc" },
@@ -61,6 +67,18 @@ export default async function MembershipPage() {
 
   return (
     <div>
+      {reason === "no-sub" && (
+        <div className="container mx-auto px-4 pt-6">
+          <div className="rounded-2xl border border-amber-300 bg-amber-50 dark:bg-amber-950/20 p-4 max-w-2xl mx-auto text-sm">
+            <p className="font-medium">Necesitás una suscripción activa</p>
+            <p className="mt-1 text-muted-foreground">
+              Elegí un plan para acceder a las clases. Si pagaste recientemente,
+              esperá unos minutos a que confirmemos el pago.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* HERO */}
       <section className="container mx-auto px-4 pt-12 sm:pt-16 pb-8 text-center max-w-2xl">
         <Badge variant="secondary" className="mb-4">

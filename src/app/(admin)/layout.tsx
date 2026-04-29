@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { AdminMobileNav } from "@/components/layout/admin-mobile-nav";
 
 export default async function AdminLayout({
   children,
@@ -50,10 +51,13 @@ export default async function AdminLayout({
       </aside>
       <main className="flex-1">
         <header className="md:hidden border-b sticky top-0 bg-background z-30">
-          <div className="flex h-14 items-center justify-between px-4">
-            <Link href="/admin" className="font-semibold">
-              Admin
-            </Link>
+          <div className="flex h-14 items-center justify-between px-4 gap-2">
+            <div className="flex items-center gap-2">
+              <AdminMobileNav />
+              <Link href="/admin" className="font-semibold">
+                Admin
+              </Link>
+            </div>
             <form
               action={async () => {
                 "use server";

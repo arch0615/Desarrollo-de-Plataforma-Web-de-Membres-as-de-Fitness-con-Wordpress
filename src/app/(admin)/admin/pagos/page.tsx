@@ -67,8 +67,8 @@ export default async function AdminPaymentsPage({
         </button>
       </form>
 
-      <div className="mt-6 rounded-2xl border overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="mt-6 rounded-2xl border overflow-x-auto">
+        <table className="w-full text-sm min-w-[720px]">
           <thead className="bg-muted/50 text-muted-foreground">
             <tr>
               <th className="text-left px-4 py-2 font-medium">Fecha</th>
