@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, intervalLabel } from "@/lib/format";
 import { GrantSubscriptionForm } from "./grant-subscription-form";
+import { MemberControls } from "./member-controls";
 
 export const metadata = { title: "Miembro" };
 
@@ -100,6 +101,14 @@ export default async function AdminMemberDetailPage({
             Sin suscripción.
           </p>
         )}
+      </section>
+
+      <section className="mt-6 rounded-2xl border p-6">
+        <h2 className="font-semibold">Acciones</h2>
+        <MemberControls
+          userId={member.id}
+          hasSubscription={!!currentSub}
+        />
       </section>
 
       <section className="mt-6 rounded-2xl border p-6">
