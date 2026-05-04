@@ -10,24 +10,30 @@ export default async function LoginPage() {
   if (session) redirect(session.user.role === "admin" ? "/admin" : "/app");
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1.5 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Hola de nuevo
+    <div className="space-y-7">
+      <div className="space-y-2">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+          Hola de <span className="text-gradient-sunset">nuevo</span>
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Iniciá sesión en tu cuenta
+        <p className="text-muted-foreground">
+          Iniciá sesión y volvé a entrenar.
         </p>
       </div>
       <LoginForm />
-      <div className="text-sm text-center text-muted-foreground">
-        ¿No tenés cuenta?{" "}
-        <Link href="/registro" className="text-foreground underline">
-          Registrate
-        </Link>
-      </div>
-      <div className="text-sm text-center">
-        <Link href="/recuperar" className="text-muted-foreground underline">
+      <div className="space-y-2 text-sm text-center pt-2">
+        <p className="text-muted-foreground">
+          ¿No tenés cuenta?{" "}
+          <Link
+            href="/registro"
+            className="text-brand-coral font-semibold hover:underline"
+          >
+            Registrate
+          </Link>
+        </p>
+        <Link
+          href="/recuperar"
+          className="text-muted-foreground hover:text-foreground transition-colors inline-block"
+        >
           Olvidé mi contraseña
         </Link>
       </div>

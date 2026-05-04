@@ -46,7 +46,11 @@ export function LoginForm() {
       {!state.ok && state.message && (
         <p className="text-sm text-destructive">{state.message}</p>
       )}
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button
+        type="submit"
+        className="w-full bg-sunset border-0 text-white shadow-md shadow-brand-coral/25 hover:opacity-95 hover:shadow-brand-coral/40 transition-all h-11 text-base font-semibold"
+        disabled={pending}
+      >
         {pending ? "Ingresando…" : "Iniciar sesión"}
       </Button>
     </form>

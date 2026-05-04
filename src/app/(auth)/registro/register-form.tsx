@@ -14,8 +14,8 @@ export function RegisterForm() {
 
   if (state.ok) {
     return (
-      <div className="rounded-xl border bg-accent/40 p-6 text-center space-y-2">
-        <p className="font-medium">¡Cuenta creada!</p>
+      <div className="rounded-2xl border border-brand-coral/20 bg-brand-coral/5 p-6 text-center space-y-2">
+        <p className="font-semibold text-brand-coral">¡Cuenta creada!</p>
         <p className="text-sm text-muted-foreground">{state.message}</p>
       </div>
     );
@@ -104,7 +104,11 @@ export function RegisterForm() {
       {state.message && !state.ok && (
         <p className="text-sm text-destructive">{state.message}</p>
       )}
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button
+        type="submit"
+        className="w-full bg-sunset border-0 text-white shadow-md shadow-brand-coral/25 hover:opacity-95 hover:shadow-brand-coral/40 transition-all h-11 text-base font-semibold"
+        disabled={pending}
+      >
         {pending ? "Creando cuenta…" : "Crear cuenta"}
       </Button>
     </form>

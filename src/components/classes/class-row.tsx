@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { ClassCard, type ClassCardData } from "./class-card";
 
 export function ClassRow({
@@ -12,14 +13,18 @@ export function ClassRow({
 }) {
   if (classes.length === 0) return null;
   return (
-    <section className="space-y-3">
-      <div className="flex items-end justify-between">
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight">
+    <section className="space-y-4">
+      <div className="flex items-end justify-between gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
           {title}
         </h2>
         {href && (
-          <Link href={href} className="text-sm text-muted-foreground underline">
+          <Link
+            href={href}
+            className="text-sm font-medium text-brand-coral hover:underline inline-flex items-center gap-1 shrink-0"
+          >
             Ver todo
+            <ArrowRight className="size-3.5" />
           </Link>
         )}
       </div>

@@ -10,20 +10,25 @@ export default async function RegisterPage() {
   if (session) redirect(session.user.role === "admin" ? "/admin" : "/app");
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1.5 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Crear cuenta</h1>
-        <p className="text-sm text-muted-foreground">
-          Empezá a entrenar en menos de un minuto
+    <div className="space-y-7">
+      <div className="space-y-2">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+          Crear <span className="text-gradient-sunset">cuenta</span>
+        </h1>
+        <p className="text-muted-foreground">
+          Empezá a entrenar en menos de un minuto.
         </p>
       </div>
       <RegisterForm />
-      <div className="text-sm text-center text-muted-foreground">
+      <p className="text-sm text-center text-muted-foreground pt-2">
         ¿Ya tenés cuenta?{" "}
-        <Link href="/login" className="text-foreground underline">
+        <Link
+          href="/login"
+          className="text-brand-coral font-semibold hover:underline"
+        >
           Iniciá sesión
         </Link>
-      </div>
+      </p>
     </div>
   );
 }

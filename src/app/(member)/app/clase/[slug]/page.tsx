@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft, Clock, Layers } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireActiveAccess } from "@/lib/access";
 import { Badge } from "@/components/ui/badge";
@@ -96,34 +97,53 @@ export default async function ClassDetailPage({
     <div className="container mx-auto px-4 py-6 sm:py-8">
       <Link
         href="/app/clases"
-        className="text-sm text-muted-foreground underline"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-brand-coral transition-colors group"
       >
-        ← Volver a la biblioteca
+        <ArrowLeft className="size-4 group-hover:-translate-x-0.5 transition-transform" />
+        Volver a la biblioteca
       </Link>
 
-      <ClassPlayer
-        classId={cls.id}
-        embedUrl={playback?.embedUrl ?? null}
-        bunnyConfigured={bunnyOk}
-        hasVideo={!!cls.bunnyVideoId}
-        resumeAt={resumeAt}
-        durationSeconds={cls.durationSeconds}
-      />
+      <div className="mt-4 rounded-3xl overflow-hidden border bg-card shadow-xl shadow-brand-plum/10">
+        <ClassPlayer
+          classId={cls.id}
+          embedUrl={playback?.embedUrl ?? null}
+          bunnyConfigured={bunnyOk}
+          hasVideo={!!cls.bunnyVideoId}
+          resumeAt={resumeAt}
+          durationSeconds={cls.durationSeconds}
+        />
+      </div>
 
-      <div className="mt-6 grid lg:grid-cols-[1fr_320px] gap-8">
+      <div className="mt-8 grid lg:grid-cols-[1fr_340px] gap-8">
         <div>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                {cls.category.name} · {formatDuration(cls.durationSeconds)}
-              </p>
-              <h1 className="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge className="bg-brand-coral/10 text-brand-coral border-0">
+                  {cls.category.name}
+                </Badge>
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                  <Clock className="size-3.5" />
+                  {formatDuration(cls.durationSeconds)}
+                </span>
+              </div>
+              <h1 className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight">
                 {cls.title}
               </h1>
-              <div className="mt-2 flex gap-1.5 flex-wrap">
-                <Badge variant="outline">{levelLabel[cls.level]}</Badge>
+              <div className="mt-3 flex gap-1.5 flex-wrap">
+                <Badge
+                  variant="outline"
+                  className="border-brand-coral/30 text-brand-coral bg-brand-coral/5"
+                >
+                  {levelLabel[cls.level]}
+                </Badge>
                 {cls.equipment.map((e) => (
-                  <Badge key={e} variant="secondary">
+                  <Badge
+                    key={e}
+                    variant="secondary"
+                    className="bg-brand-amber/15 text-brand-amber border-0"
+                  >
+                    <Layers className="size-3" />
                     {e}
                   </Badge>
                 ))}
@@ -139,21 +159,26 @@ export default async function ClassDetailPage({
           </div>
 
           {cls.description && (
-            <p className="mt-5 text-muted-foreground whitespace-pre-line leading-relaxed">
-              {cls.description}
-            </p>
+            <div className="mt-6 rounded-2xl border bg-card p-6">
+              <p className="text-foreground/80 whitespace-pre-line leading-relaxed">
+                {cls.description}
+              </p>
+            </div>
           )}
         </div>
 
         {relatedCards.length > 0 && (
           <aside>
-            <h2 className="text-lg font-semibold tracking-tight mb-3">
-              Más de {cls.category.name}
-            </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
-              {relatedCards.slice(0, 4).map((c) => (
-                <ClassCard key={c.id} c={c} size="sm" />
-              ))}
+            <div className="sticky top-20">
+              <h2 className="text-lg font-bold tracking-tight mb-4 flex items-center gap-2">
+                <span className="size-2 rounded-full bg-brand-coral" />
+                Más de {cls.category.name}
+              </h2>
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+                {relatedCards.slice(0, 4).map((c) => (
+                  <ClassCard key={c.id} c={c} size="sm" />
+                ))}
+              </div>
             </div>
           </aside>
         )}

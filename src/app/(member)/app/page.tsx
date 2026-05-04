@@ -1,7 +1,11 @@
 import Link from "next/link";
+import { Flame, Library, Sparkles } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireActiveAccess } from "@/lib/access";
 import { ClassRow } from "@/components/classes/class-row";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { ClassCardData } from "@/components/classes/class-card";
 
 export const metadata = { title: "Inicio" };
@@ -84,15 +88,48 @@ export default async function DashboardPage() {
     }),
   );
 
+  const firstName = session?.user.name?.split(" ")[0] ?? "atleta";
+
   return (
-    <div className="container mx-auto px-4 py-8 sm:py-10 space-y-10">
-      <header>
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-          Hola, {session?.user.name?.split(" ")[0] ?? "atleta"} 👋
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Tu biblioteca, lista cuando vos quieras.
-        </p>
+    <div className="container mx-auto px-4 py-8 sm:py-10 space-y-12">
+      {/* Greeting hero — plum gradient with sunset accents */}
+      <header className="relative isolate rounded-3xl overflow-hidden bg-plum-hero texture-grain p-8 sm:p-12">
+        <div className="absolute -top-16 -right-16 size-56 rounded-full bg-brand-coral/30 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 size-56 rounded-full bg-brand-amber/20 blur-3xl" />
+        <div className="relative">
+          <Badge className="bg-white/15 text-white border-white/20 backdrop-blur-sm">
+            <Flame className="size-3.5 text-brand-amber" />
+            {continueWatching.length > 0 ? "Seguí donde dejaste" : "Bienvenida"}
+          </Badge>
+          <h1 className="mt-4 text-3xl sm:text-5xl font-bold tracking-tight text-white">
+            Hola, <span className="text-gradient-sunset">{firstName}</span> 👋
+          </h1>
+          <p className="mt-3 text-white/80 max-w-md">
+            Tu biblioteca, lista cuando vos quieras. ¿Qué entrenamos hoy?
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/app/clases"
+              className={cn(
+                buttonVariants({ size: "default" }),
+                "bg-sunset border-0 text-white shadow-md shadow-brand-coral/30 hover:opacity-95 hover:shadow-brand-coral/40 transition-all font-semibold",
+              )}
+            >
+              <Library className="size-4" />
+              Explorar clases
+            </Link>
+            <Link
+              href="/app/listas"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "default" }),
+                "bg-white/10 border-white/30 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white",
+              )}
+            >
+              <Sparkles className="size-4" />
+              Mis listas
+            </Link>
+          </div>
+        </div>
       </header>
 
       {continueWatching.length > 0 && (
@@ -115,14 +152,23 @@ export default async function DashboardPage() {
       ))}
 
       {recentCards.length === 0 && (
-        <div className="rounded-2xl border p-8 text-center bg-accent/30">
-          <p className="font-medium">Tu biblioteca está casi lista.</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Pronto vas a ver acá las clases publicadas.
+        <div className="relative rounded-3xl border-2 border-dashed border-brand-coral/30 bg-brand-coral/5 p-10 text-center">
+          <div className="size-12 mx-auto rounded-2xl bg-sunset grid place-items-center shadow-lg shadow-brand-coral/30">
+            <Library className="size-5 text-white" />
+          </div>
+          <p className="mt-4 font-semibold text-lg">
+            Tu biblioteca está casi lista.
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
+            Pronto vas a ver acá las clases publicadas. Mientras tanto, podés
+            empezar a explorar.
           </p>
           <Link
             href="/app/clases"
-            className="text-sm underline mt-3 inline-block"
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "mt-5 bg-sunset border-0 text-white shadow-md shadow-brand-coral/25 hover:opacity-95",
+            )}
           >
             Explorar clases
           </Link>

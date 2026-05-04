@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import {
+  CheckCircle2,
+  Sparkles,
+  Star,
+  ArrowRight,
+  Shield,
+  Zap,
+} from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -50,6 +57,30 @@ const FAQ = [
   },
 ];
 
+const TESTIMONIALS = [
+  {
+    quote:
+      "Las clases son cortas pero efectivas. Lo mejor: puedo entrenar a la mañana antes del trabajo.",
+    name: "Lucía",
+    from: "Buenos Aires",
+    initial: "L",
+  },
+  {
+    quote:
+      "Pasé de no estirarme nunca a moverme libre. La biblioteca tiene de todo y el nivel sube de a poco.",
+    name: "Mariana",
+    from: "Córdoba",
+    initial: "M",
+  },
+  {
+    quote:
+      "Volví a sentir mi cuerpo. Las explicaciones de Milagros son super claras.",
+    name: "Sofía",
+    from: "Mendoza",
+    initial: "S",
+  },
+];
+
 export default async function MembershipPage({
   searchParams,
 }: {
@@ -62,15 +93,17 @@ export default async function MembershipPage({
     orderBy: { sortOrder: "asc" },
   });
 
-  // Find the monthly plan to compute savings vs other intervals.
   const monthly = plans.find((p) => p.interval === "month");
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       {reason === "no-sub" && (
         <div className="container mx-auto px-4 pt-6">
-          <div className="rounded-2xl border border-amber-300 bg-amber-50 dark:bg-amber-950/20 p-4 max-w-2xl mx-auto text-sm">
-            <p className="font-medium">Necesitás una suscripción activa</p>
+          <div className="rounded-2xl border border-brand-amber/40 bg-brand-amber/10 p-4 max-w-2xl mx-auto text-sm">
+            <p className="font-semibold flex items-center gap-2">
+              <Shield className="size-4 text-brand-amber" />
+              Necesitás una suscripción activa
+            </p>
             <p className="mt-1 text-muted-foreground">
               Elegí un plan para acceder a las clases. Si pagaste recientemente,
               esperá unos minutos a que confirmemos el pago.
@@ -79,23 +112,30 @@ export default async function MembershipPage({
         </div>
       )}
 
-      {/* HERO */}
-      <section className="container mx-auto px-4 pt-12 sm:pt-16 pb-8 text-center max-w-2xl">
-        <Badge variant="secondary" className="mb-4">
+      {/* HERO with decorative orbs */}
+      <section className="relative isolate container mx-auto px-4 pt-16 sm:pt-24 pb-10 text-center max-w-3xl">
+        <div className="absolute -top-10 -left-10 size-72 rounded-full bg-brand-coral/15 blur-3xl -z-10" />
+        <div className="absolute -top-10 -right-10 size-72 rounded-full bg-brand-amber/15 blur-3xl -z-10" />
+        <Badge
+          variant="secondary"
+          className="mb-5 bg-brand-coral/10 text-brand-coral border-0"
+        >
+          <Sparkles className="size-3.5" />
           Planes
         </Badge>
-        <h1 className="text-4xl sm:text-5xl font-semibold tracking-tight">
-          Elegí cómo querés entrenar.
+        <h1 className="text-4xl sm:text-6xl font-bold tracking-tight">
+          Elegí cómo querés{" "}
+          <span className="text-gradient-sunset">entrenar.</span>
         </h1>
-        <p className="mt-4 text-muted-foreground">
+        <p className="mt-5 text-lg text-muted-foreground max-w-xl mx-auto">
           Mismo acceso ilimitado en todos los planes — el más largo te ahorra
           más.
         </p>
       </section>
 
       {/* PRICING */}
-      <section className="container mx-auto px-4 pb-12">
-        <div className="grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
+      <section className="container mx-auto px-4 pb-16">
+        <div className="grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {plans.map((p) => {
             const featured = p.interval === "quarter";
             const monthlyEquivalent = Math.round(
@@ -104,159 +144,228 @@ export default async function MembershipPage({
             const savings =
               monthly && p.interval !== "month"
                 ? Math.round(
-                    (1 -
-                      monthlyEquivalent / monthly.priceCents) *
-                      100,
+                    (1 - monthlyEquivalent / monthly.priceCents) * 100,
                   )
                 : 0;
-            const features = Array.isArray(p.features) ? (p.features as string[]) : [];
+            const features = Array.isArray(p.features)
+              ? (p.features as string[])
+              : [];
 
             return (
               <div
                 key={p.id}
                 className={cn(
-                  "rounded-3xl border p-6 flex flex-col bg-background relative",
-                  featured && "border-foreground shadow-lg",
+                  "relative rounded-3xl flex flex-col bg-card transition-all",
+                  featured
+                    ? "border-2 border-transparent bg-clip-padding p-[2px] shadow-2xl shadow-brand-coral/20 lg:scale-105 lg:-my-2"
+                    : "border p-7 hover:shadow-xl hover:shadow-brand-plum/10 hover:-translate-y-0.5",
                 )}
+                style={
+                  featured
+                    ? {
+                        backgroundImage:
+                          "linear-gradient(var(--card), var(--card)), linear-gradient(135deg, var(--brand-coral), var(--brand-amber))",
+                        backgroundOrigin: "border-box",
+                        backgroundClip: "padding-box, border-box",
+                      }
+                    : undefined
+                }
               >
-                {featured && (
-                  <Badge className="absolute -top-3 left-6">
-                    <Sparkles className="size-3" /> Más elegido
-                  </Badge>
-                )}
-                <p className="text-sm uppercase tracking-wide text-muted-foreground">
-                  {p.name}
-                </p>
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-3xl font-semibold">
-                    {formatPrice(p.priceCents, { currency: p.currency })}
-                  </span>
-                  <span className="text-muted-foreground text-sm">
-                    /{intervalLabel(p.interval)}
-                  </span>
-                </div>
-                {p.interval !== "month" && monthly && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Equivale a{" "}
-                    {formatPrice(monthlyEquivalent, { currency: p.currency })}/mes
-                    {savings > 0 && (
-                      <span className="ml-1 text-foreground font-medium">
-                        (ahorrás {savings}%)
-                      </span>
-                    )}
+                <div className={cn(featured ? "p-7 rounded-[calc(theme(borderRadius.3xl)-2px)]" : "")}>
+                  {featured && (
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-sunset border-0 text-white shadow-lg shadow-brand-coral/40 px-3">
+                      <Sparkles className="size-3" /> Más elegido
+                    </Badge>
+                  )}
+                  <p className="text-sm uppercase tracking-wider font-semibold text-brand-coral">
+                    {p.name}
                   </p>
-                )}
-                <ul className="mt-5 space-y-2">
-                  {features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex items-start gap-2 text-sm text-muted-foreground"
-                    >
-                      <CheckCircle2 className="size-4 mt-0.5 shrink-0 text-foreground" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={`/registro?plan=${p.slug}`}
-                  className={buttonVariants({
-                    variant: featured ? "default" : "outline",
-                    className: "mt-6",
-                  })}
-                >
-                  Elegir {p.name}
-                </Link>
+                  <div className="mt-4 flex items-baseline gap-1.5">
+                    <span className="text-5xl font-bold tracking-tight">
+                      {formatPrice(p.priceCents, { currency: p.currency })}
+                    </span>
+                    <span className="text-muted-foreground text-sm">
+                      /{intervalLabel(p.interval)}
+                    </span>
+                  </div>
+                  {p.interval !== "month" && monthly && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Equivale a{" "}
+                      <span className="font-semibold text-foreground">
+                        {formatPrice(monthlyEquivalent, {
+                          currency: p.currency,
+                        })}
+                        /mes
+                      </span>
+                      {savings > 0 && (
+                        <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-amber/15 text-brand-amber text-xs font-bold">
+                          <Zap className="size-3" />
+                          ahorrás {savings}%
+                        </span>
+                      )}
+                    </p>
+                  )}
+                  <div className="my-6 h-px bg-border" />
+                  <ul className="space-y-3">
+                    {features.map((f) => (
+                      <li
+                        key={f}
+                        className="flex items-start gap-2.5 text-sm"
+                      >
+                        <div className="size-5 rounded-full bg-brand-coral/15 grid place-items-center shrink-0 mt-0.5">
+                          <CheckCircle2 className="size-3 text-brand-coral" />
+                        </div>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/registro?plan=${p.slug}`}
+                    className={cn(
+                      buttonVariants({ size: "lg" }),
+                      "mt-7 w-full h-12 text-base font-semibold transition-all",
+                      featured
+                        ? "bg-sunset border-0 text-white shadow-lg shadow-brand-coral/30 hover:opacity-95 hover:shadow-brand-coral/40 hover:translate-y-[-1px]"
+                        : "bg-foreground text-background hover:bg-foreground/90",
+                    )}
+                  >
+                    Elegir {p.name}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </div>
               </div>
             );
           })}
         </div>
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          Pago seguro vía Mercado Pago · Cancelás cuando quieras
+        </p>
       </section>
 
-      {/* INCLUDED */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="rounded-3xl border bg-accent/30 p-8 sm:p-12 max-w-4xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center">
-            Todo incluido en cualquier plan
-          </h2>
-          <ul className="mt-8 grid sm:grid-cols-2 gap-3">
-            {INCLUDED.map((item) => (
-              <li
-                key={item}
-                className="flex items-start gap-2 text-sm sm:text-base"
-              >
-                <CheckCircle2 className="size-5 mt-0.5 shrink-0 text-foreground" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
+      {/* INCLUDED — plum panel with sunset accent corner */}
+      <section className="container mx-auto px-4 py-12 max-w-5xl">
+        <div className="relative rounded-4xl bg-plum-hero overflow-hidden p-10 sm:p-14 texture-grain">
+          <div className="absolute -top-20 -right-20 size-72 rounded-full bg-brand-coral/30 blur-3xl" />
+          <div className="absolute -bottom-20 -left-20 size-72 rounded-full bg-brand-amber/20 blur-3xl" />
+          <div className="relative">
+            <div className="text-center">
+              <Badge className="bg-white/15 text-white border-white/20 backdrop-blur-sm">
+                Todo incluido
+              </Badge>
+              <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight text-white">
+                Lo mismo en{" "}
+                <span className="text-gradient-sunset">cada plan</span>
+              </h2>
+            </div>
+            <ul className="mt-10 grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+              {INCLUDED.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-3 text-white/90"
+                >
+                  <div className="size-7 rounded-full bg-sunset grid place-items-center shrink-0 shadow-md shadow-brand-coral/30">
+                    <CheckCircle2 className="size-4 text-white" />
+                  </div>
+                  <span className="pt-0.5">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
-      {/* TESTIMONIALS — placeholder content; client to provide real ones */}
-      <section className="container mx-auto px-4 py-12">
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center">
-          Lo que dicen las alumnas
-        </h2>
-        <div className="mt-8 grid md:grid-cols-3 gap-4 max-w-5xl mx-auto">
-          {[
-            {
-              quote:
-                "Las clases son cortas pero efectivas. Lo mejor: puedo entrenar a la mañana antes del trabajo.",
-              name: "Lucía",
-              from: "Buenos Aires",
-            },
-            {
-              quote:
-                "Pasé de no estirarme nunca a moverme libre. La biblioteca tiene de todo y el nivel sube de a poco.",
-              name: "Mariana",
-              from: "Córdoba",
-            },
-            {
-              quote:
-                "Volví a sentir mi cuerpo. Las explicaciones de Milagros son super claras.",
-              name: "Sofía",
-              from: "Mendoza",
-            },
-          ].map((t, i) => (
-            <div key={i} className="rounded-2xl border p-5 bg-background">
-              <p className="text-sm leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-              <p className="mt-4 text-sm font-medium">
-                {t.name}{" "}
-                <span className="text-muted-foreground font-normal">
-                  · {t.from}
-                </span>
+      {/* TESTIMONIALS */}
+      <section className="container mx-auto px-4 py-16 max-w-5xl">
+        <div className="text-center mb-10">
+          <Badge
+            variant="secondary"
+            className="bg-brand-amber/15 text-brand-amber border-0"
+          >
+            Alumnas reales
+          </Badge>
+          <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">
+            Lo que dicen{" "}
+            <span className="text-gradient-sunset">las alumnas</span>
+          </h2>
+        </div>
+        <div className="grid md:grid-cols-3 gap-5">
+          {TESTIMONIALS.map((t, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border bg-card p-6 hover:shadow-xl hover:shadow-brand-plum/10 hover:-translate-y-1 transition-all"
+            >
+              <div className="flex gap-0.5 mb-4">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star
+                    key={s}
+                    className="size-4 fill-brand-amber text-brand-amber"
+                  />
+                ))}
+              </div>
+              <p className="text-base leading-relaxed">
+                &ldquo;{t.quote}&rdquo;
               </p>
+              <div className="mt-5 pt-5 border-t flex items-center gap-3">
+                <div className="size-10 rounded-full bg-sunset grid place-items-center text-white font-bold">
+                  {t.initial}
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">{t.from}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="container mx-auto px-4 py-12 max-w-2xl">
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-center">
-          Preguntas sobre la membresía
-        </h2>
-        <Accordion className="mt-6">
+      <section className="container mx-auto px-4 pb-16 max-w-2xl">
+        <div className="text-center mb-8">
+          <Badge
+            variant="secondary"
+            className="bg-brand-teal/15 text-brand-teal border-0"
+          >
+            FAQ
+          </Badge>
+          <h2 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">
+            Preguntas sobre la membresía
+          </h2>
+        </div>
+        <Accordion>
           {FAQ.map((f, i) => (
             <AccordionItem key={i} value={`q-${i}`}>
-              <AccordionTrigger>{f.q}</AccordionTrigger>
-              <AccordionContent>{f.a}</AccordionContent>
+              <AccordionTrigger className="text-left text-base font-semibold">
+                {f.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                {f.a}
+              </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
       </section>
 
       {/* FINAL CTA */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-          Empezá cuando estés lista.
-        </h2>
-        <Link
-          href="/registro"
-          className={buttonVariants({ size: "lg", className: "mt-6" })}
-        >
-          Crear mi cuenta
-        </Link>
+      <section className="container mx-auto px-4 pb-20 max-w-5xl">
+        <div className="relative rounded-4xl bg-sunset overflow-hidden p-12 sm:p-16 text-center texture-grain">
+          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
+            Empezá cuando estés lista.
+          </h2>
+          <p className="mt-4 text-white/90 max-w-md mx-auto">
+            Crear cuenta es gratis — pagás solo cuando elijas tu plan.
+          </p>
+          <Link
+            href="/registro"
+            className={cn(
+              buttonVariants({ size: "lg" }),
+              "mt-8 bg-white text-brand-coral hover:bg-white/95 hover:translate-y-[-1px] transition-all h-12 px-8 text-base font-bold shadow-xl",
+            )}
+          >
+            Crear mi cuenta
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
       </section>
     </div>
   );
